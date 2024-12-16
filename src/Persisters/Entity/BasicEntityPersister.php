@@ -1995,8 +1995,10 @@ class BasicEntityPersister implements EntityPersister
 
             return $newValue;
         }
+        $singleIdentifierValue = $this->em->getUnitOfWork()->getSingleIdentifierValue($value);
+        $singleIdentifierType  = Type::getType($class->fieldMappings[$class->getSingleIdentifierFieldName()]->type);
 
-        return [$this->em->getUnitOfWork()->getSingleIdentifierValue($value)];
+        return [$singleIdentifierType->convertToDatabaseValue($singleIdentifierValue, $this->platform)];
     }
 
     public function exists(object $entity, Criteria|null $extraConditions = null): bool
