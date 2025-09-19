@@ -229,7 +229,9 @@ class PersisterHelper
 
             return $newValue;
         }
+        $fieldType = Type::getType($class->fieldMappings[$class->getSingleIdentifierFieldName()]->type);
+        $fieldValue = $em->getUnitOfWork()->getSingleIdentifierValue($value);
 
-        return [$em->getUnitOfWork()->getSingleIdentifierValue($value)];
+        return [$fieldType->convertToDatabaseValue($fieldValue, $em->getConnection()->getDatabasePlatform())];
     }
 }

@@ -12,6 +12,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Cache\Persister\CachedPersister;
 use Doctrine\ORM\Event\ListenersInvoker;
 use Doctrine\ORM\Event\OnClearEventArgs;
@@ -2630,6 +2631,8 @@ class UnitOfWork implements PropertyChangedListener
             }
 
             $class   = $this->em->getClassMetadata($entityName);
+            $idType  = Type::getType($class->fieldMappings[$class->getSingleIdentifierFieldName()]->type);
+            $ids     = array_map(fn ($id) => $idType->convertToDatabaseValue($id, $this->em->getConnection()->getDatabasePlatform()), $ids);
             $batches = array_chunk($ids, $this->em->getConfiguration()->getEagerFetchBatchSize());
 
             foreach ($batches as $batchedIds) {
